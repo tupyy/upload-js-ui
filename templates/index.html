@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <link href="css/bootstrap.css" rel="stylesheet">
-    <link href="css/upload/fileui.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename="css/bootstrap.css") }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename="css/upload/fileui.css") }}" rel="stylesheet">
 </head>
 <body>
     <div class="file-list-container">
     </div>
 </body>
 
-<script src="js/bootstrap.bundle.js"></script>
+<script src="{{ url_for('static', filename='js/bootstrap.bundle.js') }}"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js" integrity="sha384-xBuQ/xzmlsLoJpyjoggmTEz8OWUFM0/RC5BsqQBDX2v5cMvDHcMakNTNrHIW2I5f" crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-<script src="js/upload/file-entry-ui.js"></script>
+<script src="{{ url_for('static', filename='js/upload/file-entry-ui.js') }}"></script>
 </html>
