@@ -9,30 +9,26 @@ $(function () {
         _create: function () {
             this.options.value = this._constrain(this.options.progressValue);
             this.element.addClass("upload-file");
-            this.mainElement = $("<td></td>").appendTo(this.element);
+            this.mainElement = $("<div></div>", {
+                "class": "file-ui row"
+            }).appendTo(this.element);
 
             this.label = $("<span></span>", {
                 text: this.filename,
-                "class": "file-label"
+                "class": "col-xs-2 file-label"
             }).appendTo(this.mainElement);
 
             this.progressbarContainer = $("<div></div>", {
-                "class": "progress"
+                "class": "col progress"
             }).appendTo(this.mainElement);
 
             this.progressbar = $("<div></div>", {
                 "class": "progress-bar bg-info",
                 "role": "progress-bar",
                 "aria-valuemin": "0",
-                "aria-valuenow": "25",
+                "aria-valuenow": "0",
                 "aria-valuemax": "100",
             }).appendTo(this.progressbarContainer);
-
-            this.uploadButton = $("<button>", {
-                text: "Upload",
-                "class": "ui-upload-button btn btn-warning"
-            }).appendTo(this.mainElement)
-                .button();
 
             this.deleteButton = $("<button>", {
                 text: "Delete",
@@ -84,7 +80,7 @@ $(function () {
     let elem = $(".file-list-container");
     uiFiles = [];
     for (let i = 0; i < 4; i++) {
-        var b = $("<tr class=\"list-group-item\"></tr>")
+        var b = $("<div class=\"list-group-item\"></div>")
             .appendTo(elem)
             .fileui().bind("fileuidelete", function (event, data) {
                 $.each(uiFiles, function (index, value) {
@@ -96,7 +92,6 @@ $(function () {
                 });
             });
         b.fileui("option", 'id', i);
-        b.fileui("option", "progressValue", "45");
         uiFiles.push(b);
     }
 });
