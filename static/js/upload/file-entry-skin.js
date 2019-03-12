@@ -1,5 +1,5 @@
 $(function () {
-    $.widget("photoGallery.fileuiSkin", {
+    $.widget("photoGallery.fileUISkin", {
         options: {
             filename: "file",
             id: 0
