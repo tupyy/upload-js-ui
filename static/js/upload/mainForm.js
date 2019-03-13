@@ -82,11 +82,13 @@ $(function () {
             return newElement;
         },
 
-        _deleteUI: function (event, id) {
-            $.each(this.options.filesUI, function(idx, item) {
-               if (item.fileui('id') === id) {
-                   item.remove();
-                   return true;
+        _deleteUI: function (event, data) {
+            let options = this.options;
+            $.each(options.data, function(idx, entry) {
+               if (entry.id === data.id) {
+                   entry.ui.fileui('destroy');
+                   options.data.splice(idx, 1);
+                   return false;
                }
             });
         }
