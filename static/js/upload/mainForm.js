@@ -3,12 +3,10 @@ $(function () {
         options: {
             // input file field
             fileInput: undefined,
-            // Array to hold the files
-            files: undefined,
+            // Define a list of dictionaries having the id of the fileUI widget, fileUI widget and file object
+            data: [],
             // Holds the url signed by the server for each file
             presignedUrl: undefined,
-            // collection of fileUI
-            filesUI: undefined,
             // fileUi container
             fileUIContainer: undefined,
             // filter the new add files agaist already added files
@@ -31,7 +29,7 @@ $(function () {
                     });
                     return newFiles;
                 }
-            },
+            }
         },
         _create: function (e) {
             let options = this.options;
@@ -56,10 +54,14 @@ $(function () {
             let newFiles = $.makeArray(data.fileInput.prop('files'));
             if (newFiles.length > 0) {
                 $.when(options.filter(newFiles)).then(function (newFiles) {
-                        that.options.files = that.options.files === undefined ?
-                            Array.prototype.concat([], newFiles) :
-                            Array.prototype.concat(that.options.files, newFiles);
-                        that._addUI(newFiles);
+                        $.map(newFiles, function(file) {
+                           let element = that._createUI(file);
+                           that.options.data.push({
+                               id: element.fileui('id'),
+                               ui: element,
+                               file: file
+                           });
+                        });
                     }
                 );
             }
@@ -68,12 +70,24 @@ $(function () {
         /**
          * Add fileUI if there are new files
          */
-        _addUI: function (newFiles) {
-            let options = this.options;
-            $.each(newFiles, (idx, file) => {
-                let newElement = $("<div></div>").fileui();
-                newElement.fileui('option', 'filename', file.name);
-                newElement.appendTo(options.fileUIContainer);
+        _createUI: function (file) {
+            let that = this,
+                options = this.options;
+            let newElement = $("<div></div>").fileui();
+            newElement.fileui('option', 'filename', file.name);
+            that._on(newElement.fileui(), {
+                'fileuidelete': that._deleteUI
+            });
+            newElement.appendTo(options.fileUIContainer);
+            return newElement;
+        },
+
+        _deleteUI: function (event, id) {
+            $.each(this.options.filesUI, function(idx, item) {
+               if (item.fileui('id') === id) {
+                   item.remove();
+                   return true;
+               }
             });
         }
     });
