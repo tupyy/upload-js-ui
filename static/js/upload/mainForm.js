@@ -5,11 +5,9 @@ $(function () {
             fileInput: undefined,
             // Define a list of dictionaries having the id of the fileUI widget, fileUI widget and file object
             data: [],
-            // Holds the url signed by the server for each file
-            presignedUrl: undefined,
             // fileUi container
             fileUIContainer: undefined,
-            // filter the new add files agaist already added files
+            // filter the new add files against already added files
             filter: function (files) {
                 let that = this;
                 if (that.files === undefined) {
@@ -68,7 +66,7 @@ $(function () {
         },
 
         /**
-         * Add fileUI if there are new files
+         * Return the newly created element for file
          */
         _createUI: function (file) {
             let that = this,
@@ -82,6 +80,7 @@ $(function () {
             return newElement;
         },
 
+        // Delete UI
         _deleteUI: function (event, data) {
             let options = this.options;
             $.each(options.data, function(idx, entry) {
