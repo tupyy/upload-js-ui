@@ -15,6 +15,10 @@ $(function () {
             }
 
             return _p8() + _p8(true) + _p8(true) + _p8();
+        },
+        destroy: function() {
+            this._off(this.element.find('.button'),'click');
+            this.element.remove();
         }
     });
 });
