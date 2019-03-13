@@ -24,7 +24,10 @@ $(function () {
                 .button();
 
             this._on(this.deleteButton, {
-                click: "_delete"
+                click: function(e) {
+                    e.preventDefault();
+                    this._delete();
+                }
             });
         },
 
