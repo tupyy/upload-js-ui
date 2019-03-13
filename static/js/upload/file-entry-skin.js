@@ -31,6 +31,10 @@ $(function () {
             });
         },
 
+        id: function() {
+          return this.options.id;
+        },
+
         refresh: function () {
             this.label.text(this.options.filename + " " + this.options.id);
         },
