@@ -9,36 +9,35 @@ $(function () {
             presignedUrl: undefined,
             // collection of fileUI
             filesUI: undefined,
-            // Add files to files array
-            add: function (files) {
+            // fileUi container
+            fileUIContainer: undefined,
+            // filter the new add files agaist already added files
+            filter: function (files) {
                 let that = this;
-                return $.Deferred(() => {
-                    if (that.files === undefined) {
-                        that.files = Array.prototype.concat([], files);
-                    } else {
-                        let newFiles = [];
-                        $.each(files, function (index, file) {
-                            let isNewFile = true;
-                            for (let i = 0; i < that.files.length; i++) {
-                                if (that.files[i].name === file.name) {
-                                    isNewFile = false;
-                                }
+                if (that.files === undefined) {
+                    return files;
+                } else {
+                    let newFiles = [];
+                    $.each(files, function (index, file) {
+                        let isNewFile = true;
+                        for (let i = 0; i < that.files.length; i++) {
+                            if (that.files[i].name === file.name) {
+                                isNewFile = false;
                             }
-                            if (isNewFile) {
-                                newFiles.push(file);
-                            }
-                        });
-                        if (newFiles.length > 0) {
-                            that.files = Array.prototype.concat(that.files, newFiles);
                         }
-                    }
-                }).promise();
+                        if (isNewFile) {
+                            newFiles.push(file);
+                        }
+                    });
+                    return newFiles;
+                }
             },
         },
         _create: function (e) {
             let options = this.options;
             if (options.fileInput === undefined) {
                 options.fileInput = this.element.find('input[type=file]');
+                options.fileUIContainer = this.element.find('.file-list-container');
                 this._on(this.options.fileInput, {
                     change: this._onChange
                 });
@@ -56,8 +55,9 @@ $(function () {
                 };
             let newFiles = $.makeArray(data.fileInput.prop('files'));
             if (newFiles.length > 0) {
-                $.when(options.add(newFiles)).then(function () {
-                        that._addUI(options.files);
+                $.when(options.filter(newFiles)).then(function (newFiles) {
+                        that.options.files = Array.prototype.concat(that.options.files, newFiles);
+                        that._addUI(newFiles);
                     }
                 );
             }
@@ -66,9 +66,13 @@ $(function () {
         /**
          * Add fileUI if there are new files
          */
-        _addUI: function (files) {
+        _addUI: function (newFiles) {
             let options = this.options;
-
+            $.each(newFiles, (idx, file) => {
+                 let newElement = $("<div></div>").fileui();
+                 newElement.fileui('option','filename', file.name);
+                 newElement.appendTo(options.fileUIContainer);
+            });
         }
     });
 });
