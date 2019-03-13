@@ -56,7 +56,9 @@ $(function () {
             let newFiles = $.makeArray(data.fileInput.prop('files'));
             if (newFiles.length > 0) {
                 $.when(options.filter(newFiles)).then(function (newFiles) {
-                        that.options.files = Array.prototype.concat(that.options.files, newFiles);
+                        that.options.files = that.options.files === undefined ?
+                            Array.prototype.concat([], newFiles) :
+                            Array.prototype.concat(that.options.files, newFiles);
                         that._addUI(newFiles);
                     }
                 );
@@ -69,9 +71,9 @@ $(function () {
         _addUI: function (newFiles) {
             let options = this.options;
             $.each(newFiles, (idx, file) => {
-                 let newElement = $("<div></div>").fileui();
-                 newElement.fileui('option','filename', file.name);
-                 newElement.appendTo(options.fileUIContainer);
+                let newElement = $("<div></div>").fileui();
+                newElement.fileui('option', 'filename', file.name);
+                newElement.appendTo(options.fileUIContainer);
             });
         }
     });
