@@ -1,7 +1,6 @@
 $(function () {
     $.widget("photoGallery.fileui", $.photoGallery.fileUISkin, {
         options: {
-            jqXHR: undefined,
             signed_url: undefined,
             file: undefined,
             filename: undefined,
