@@ -37,6 +37,12 @@ $(function () {
                 this._on(this.options.fileInput, {
                     change: this._onChange
                 });
+                this._on(this.element.find('#submitButton'), {
+                    'click': this._submit
+                });
+                this._on(this.element.find('#abortButton'),{
+                    'click': this._abort
+                })
             }
         },
 
@@ -90,6 +96,13 @@ $(function () {
                    return false;
                }
             });
+        },
+        _submit: function() {
+
+        },
+        _abort: function() {
+
         }
+
     });
 });
