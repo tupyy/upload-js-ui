@@ -4,10 +4,12 @@ $(function () {
             // input file field
             fileInput: undefined,
             // Define a list of dictionaries having the id of the fileUI widget, fileUI widget and file object
-            data: [],
+            filesUI: [],
             // fileUi container
             fileUIContainer: undefined,
-            // filter the new add files against already added files
+            // filter the new add files against already added files,
+            xhrOptions: undefined,
+
             filter: function (files) {
                 let that = this;
                 if (that.files === undefined) {
@@ -40,7 +42,7 @@ $(function () {
                 this._on(this.element.find('#submitButton'), {
                     'click': this._submit
                 });
-                this._on(this.element.find('#abortButton'),{
+                this._on(this.element.find('#abortButton'), {
                     'click': this._abort
                 })
             }
@@ -58,9 +60,9 @@ $(function () {
             let newFiles = $.makeArray(data.fileInput.prop('files'));
             if (newFiles.length > 0) {
                 $.when(options.filter(newFiles)).then(function (newFiles) {
-                        $.map(newFiles, function(file) {
-                           let element = that._createUI(file);
-                           that.options.data.push(element);
+                        $.map(newFiles, function (file) {
+                            let element = that._createUI(file);
+                            that.options.filesUI.push(element);
                         });
                     }
                 );
@@ -74,7 +76,7 @@ $(function () {
             let that = this,
                 options = this.options;
             let newElement = $("<div></div>").fileui({
-                'filename' : file.name,
+                'filename': file.name,
                 'file': file
             });
             that._on(newElement.fileui(), {
@@ -87,18 +89,43 @@ $(function () {
         // Delete UI
         _deleteUI: function (event, data) {
             let options = this.options;
-            $.each(options.data, function(idx, entry) {
-               if (entry.fileui('option','id') === data.id) {
-                   entry.fileui('destroy');
-                   options.data.splice(idx, 1);
-                   return false;
-               }
+            $.each(options.filesUI, function (idx, entry) {
+                if (entry.fileui('option', 'id') === data.id) {
+                    entry.fileui('destroy');
+                    options.filesUI.splice(idx, 1);
+                    return false;
+                }
             });
         },
-        _submit: function() {
 
+        _initOptions: function(options) {
+            if (!options) {
+                options = {}
+            }
+            options.headers = {};
+            options.type = {};
+            options.data = {};
+            options.url = "";
         },
-        _abort: function() {
+        // create the ajax settings for signing the files
+        _initDataforSigning: function (options) {
+            this._initOptions(options);
+            options.headers['Content-Type'] = 'application/json';
+            options.type = 'POST';
+            options.url = '/sign-s3';
+            $.each(options.filesUI, (idx, value) => {
+                options.data[value.fileui('option','id')] = {
+                    'filename' : value.fileui('option','filename'),
+                    'filetype' : value.fileui('option','file').type
+                }
+            });
+        },
+        _submit: function () {
+            let that = this,
+                o = this.options;
+            that._initDataforSigning(o);
+        },
+        _abort: function () {
 
         }
 
