@@ -29,16 +29,14 @@ def sign_s3():
             ClientMethod='put_object',
             Params={
                 'Bucket': S3_BUCKET,
-                'Key': v.filename,
-                'ContentType': v.filetype
+                'Key': v.get('filename'),
+                'ContentType': v.get('filetype')
             }
         )
         signed_urls[k] = presigned_url
 
     # Return the data to the client
-    return jsonify({
-        'presigned_urls': signed_urls
-    })
+    return jsonify(signed_urls)
 
 
 if __name__ == '__main__':
