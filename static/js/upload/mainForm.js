@@ -10,6 +10,8 @@ $(function () {
             // filter the new add files against already added files,
             xhrOptions: undefined,
 
+            jqXHR: undefined,
+
             filter: function (files) {
                 let that = this;
                 if (that.files === undefined) {
@@ -40,7 +42,10 @@ $(function () {
                     change: this._onChange
                 });
                 this._on(this.element.find('#submitButton'), {
-                    'click': this._submit
+                    click: function(e) {
+                        e.preventDefault();
+                        this._submit();
+                    }
                 });
                 this._on(this.element.find('#abortButton'), {
                     'click': this._abort
@@ -98,7 +103,7 @@ $(function () {
             });
         },
 
-        _initOptions: function(options) {
+        _initOptions: function (options) {
             if (!options) {
                 options = {}
             }
@@ -113,17 +118,24 @@ $(function () {
             options.headers['Content-Type'] = 'application/json';
             options.type = 'POST';
             options.url = '/sign-s3';
+            tempData = {};
             $.each(options.filesUI, (idx, value) => {
-                options.data[value.fileui('option','id')] = {
-                    'filename' : value.fileui('option','filename'),
-                    'filetype' : value.fileui('option','file').type
-                }
+                tempData[value.fileui('option', 'id')] = {
+                    'filename': value.fileui('option', 'filename'),
+                    'filetype': value.fileui('option', 'file').type
+                };
             });
+            options.data = JSON.stringify(tempData)
         },
         _submit: function () {
             let that = this,
                 o = this.options;
             that._initDataforSigning(o);
+            jqXHR = ($.ajax(o)).done(function (result, textStatus, jqXHR) {
+                console.log(result);
+            });
+            console.log(jqXHR);
+            jqXHR.resolve();
         },
         _abort: function () {
 
