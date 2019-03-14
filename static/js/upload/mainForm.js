@@ -60,11 +60,7 @@ $(function () {
                 $.when(options.filter(newFiles)).then(function (newFiles) {
                         $.map(newFiles, function(file) {
                            let element = that._createUI(file);
-                           that.options.data.push({
-                               id: element.fileui('id'),
-                               ui: element,
-                               file: file
-                           });
+                           that.options.data.push(element);
                         });
                     }
                 );
@@ -77,8 +73,10 @@ $(function () {
         _createUI: function (file) {
             let that = this,
                 options = this.options;
-            let newElement = $("<div></div>").fileui();
-            newElement.fileui('option', 'filename', file.name);
+            let newElement = $("<div></div>").fileui({
+                'filename' : file.name,
+                'file': file
+            });
             that._on(newElement.fileui(), {
                 'fileuidelete': that._deleteUI
             });
@@ -90,8 +88,8 @@ $(function () {
         _deleteUI: function (event, data) {
             let options = this.options;
             $.each(options.data, function(idx, entry) {
-               if (entry.id === data.id) {
-                   entry.ui.fileui('destroy');
+               if (entry.fileui('option','id') === data.id) {
+                   entry.fileui('destroy');
                    options.data.splice(idx, 1);
                    return false;
                }
