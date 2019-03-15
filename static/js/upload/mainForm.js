@@ -4,7 +4,7 @@ $(function () {
             // input file field
             fileInput: undefined,
             // Define a list of dictionaries having the id of the fileUI widget, fileUI widget and file object
-            filesUI: [],
+            filesUI: {},
             // fileUi container
             fileUIContainer: undefined,
             // filter the new add files against already added files,
@@ -42,7 +42,7 @@ $(function () {
                     change: this._onChange
                 });
                 this._on(this.element.find('#submitButton'), {
-                    click: function(e) {
+                    click: function (e) {
                         e.preventDefault();
                         this._submit();
                     }
@@ -67,7 +67,7 @@ $(function () {
                 $.when(options.filter(newFiles)).then(function (newFiles) {
                         $.map(newFiles, function (file) {
                             let element = that._createUI(file);
-                            that.options.filesUI.push(element);
+                            that.options.filesUI[element.fileui('option','id')] = element;
                         });
                     }
                 );
@@ -94,10 +94,10 @@ $(function () {
         // Delete UI
         _deleteUI: function (event, data) {
             let options = this.options;
-            $.each(options.filesUI, function (idx, entry) {
-                if (entry.fileui('option', 'id') === data.id) {
+            $.each(options.filesUI, function (id, entry) {
+                if (id === data.id) {
                     entry.fileui('destroy');
-                    options.filesUI.splice(idx, 1);
+                    delete options.filesUI[id];
                     return false;
                 }
             });
@@ -131,14 +131,24 @@ $(function () {
             let that = this,
                 o = this.options;
             that._initDataforSigning(o);
-            jqXHR = ($.ajax(o)).done(function (result, textStatus, jqXHR) {
-                console.log(result);
+            this.jqXHR = $.ajax(o).done(function (result, textStatus, jqXHR) {
+                that._initDataForAws(result);
             });
-            console.log(jqXHR);
-            jqXHR.resolve();
         },
         _abort: function () {
-
+            if (this.jqXHR) {
+                return this.jqXHR.abort();
+            }
+        },
+        _initDataForAws: function (signed_urls) {
+            let that = this,
+                o = this.options;
+            for (let key in signed_urls) {
+                if (key in o.filesUI) {
+                    let item = o.filesUI[key];
+                    item.fileui('setSignedUrl',signed_urls[key]);
+                }
+            }
         }
 
     });
