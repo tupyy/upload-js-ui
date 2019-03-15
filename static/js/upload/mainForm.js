@@ -67,7 +67,7 @@ $(function () {
                 $.when(options.filter(newFiles)).then(function (newFiles) {
                         $.map(newFiles, function (file) {
                             let element = that._createUI(file);
-                            that.options.filesUI[element.fileui('option','id')] = element;
+                            that.options.filesUI[element.fileui('option', 'id')] = element;
                         });
                     }
                 );
@@ -131,9 +131,16 @@ $(function () {
             let that = this,
                 o = this.options;
             that._initDataforSigning(o);
-            this.jqXHR = $.ajax(o).done(function (result, textStatus, jqXHR) {
+            this.jqXHR = $.ajax(o);
+            this.jqXHR.done(function (result, textStatus, jqXHR) {
                 that._initDataForAws(result);
             });
+            this.jqXHR.then(function () {
+                $.each(that.options.filesUI, (id, obj) => {
+                    let o = obj.fileui('option');
+                    that._uploadFile(o);
+                });
+            })
         },
         _abort: function () {
             if (this.jqXHR) {
@@ -146,9 +153,26 @@ $(function () {
             for (let key in signed_urls) {
                 if (key in o.filesUI) {
                     let item = o.filesUI[key];
-                    item.fileui('setSignedUrl',signed_urls[key]);
+                    item.fileui('setSignedUrl', signed_urls[key]);
                 }
             }
+        },
+        _uploadFile: function (o) {
+            const xhr = new XMLHttpRequest();
+            const postData = new FormData();
+            postData.append('file', o.file.blob);
+            xhr.onreadystatechange = () => {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200 || xhr.status === 204) {
+                        alert('upload ok');
+                    } else {
+                        alert('Could not upload file.');
+                    }
+                }
+            };
+            xhr.open('PUT', o.url, true);
+            xhr.setRequestHeader('Content-type', o.file.type);
+            xhr.send(postData);
         }
 
     });
