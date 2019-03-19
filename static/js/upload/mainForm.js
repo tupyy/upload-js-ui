@@ -137,8 +137,7 @@ $(function () {
             });
             this.jqXHR.then(function () {
                 $.each(that.options.filesUI, (id, obj) => {
-                    let o = obj.fileui('option');
-                    that._uploadFile(o);
+                    obj.fileui('send');
                 });
             })
         },
@@ -157,23 +156,6 @@ $(function () {
                 }
             }
         },
-        _uploadFile: function (o) {
-            const xhr = new XMLHttpRequest();
-            const postData = new FormData();
-            postData.append('file', o.file.blob);
-            xhr.onreadystatechange = () => {
-                if (xhr.readyState === 4) {
-                    if (xhr.status === 200 || xhr.status === 204) {
-                        alert('upload ok');
-                    } else {
-                        alert('Could not upload file.');
-                    }
-                }
-            };
-            xhr.open('PUT', o.url, true);
-            xhr.setRequestHeader('Content-type', o.file.type);
-            xhr.send(postData);
-        }
 
     });
 });

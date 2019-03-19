@@ -4,7 +4,8 @@ $(function () {
             signed_url: undefined,
             file: undefined,
             filename: undefined,
-            id: undefined
+            id: undefined,
+            progress: 0
         },
         _create: function () {
             this._super();
@@ -46,6 +47,35 @@ $(function () {
             this.options.url = signed_url;
         },
 
+        send: function () {
+            const xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = () => {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200 || xhr.status === 204) {
+                        console.log('ok')
+                    } else {
+                        alert('Could not upload file.');
+                    }
+                }
+            };
+            const self = this;
+            xhr.upload.addEventListener("progress", function (e) {
+                if (e.lengthComputable) {
+                    const progress = Math.round((e.loaded * 100) / e.total);
+                    self.refresh(progress);
+                }
+            }, false);
+
+            xhr.upload.addEventListener("load", function (e) {
+                self.refresh(100);
+            }, false);
+
+            xhr.open('PUT', this.options.url, true);
+            xhr.setRequestHeader('Content-type', this.options.file.type);
+            xhr.overrideMimeType(this.options.file.type);
+            xhr.send(this.options.file);
+        },
+
         guid: function () {
             function _p8(s) {
                 var p = (Math.random().toString(16) + "000000000").substr(2, 8);
@@ -53,10 +83,12 @@ $(function () {
             }
 
             return _p8() + _p8(true) + _p8(true) + _p8();
-        },
+        }
+        ,
         destroy: function () {
             this._off(this.element.find('.button'), 'click');
             this.element.remove();
         }
-    });
+    })
+    ;
 });
