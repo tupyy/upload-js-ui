@@ -5,7 +5,8 @@ $(function () {
             file: undefined,
             filename: undefined,
             id: undefined,
-            progress: 0
+            progress: 0,
+            uploaded: false,
         },
         _create: function () {
             this._super();
@@ -25,14 +26,6 @@ $(function () {
             this.refresh();
         },
 
-        upload: function () {
-            let o = this.options;
-            let jqXHR = $.ajax(o).done(function () {
-                console.log("upload complete")
-            }).fail(function (result, textStatus, jqXHR) {
-                console.log(result);
-            })
-        },
         setSignedUrl: function (signed_url) {
             this.options.signed_url = signed_url;
             this._initXHRData(signed_url);
@@ -49,15 +42,12 @@ $(function () {
 
         send: function () {
             const xhr = new XMLHttpRequest();
-            xhr.onreadystatechange = () => {
-                if (xhr.readyState === 4) {
-                    if (xhr.status === 200 || xhr.status === 204) {
-                        console.log('ok')
-                    } else {
-                        alert('Could not upload file.');
-                    }
-                }
-            };
+            dfd = $.Deferred();
+
+            if (this.options.uploaded) {
+                dfd.resolve();
+            }
+
             const self = this;
             xhr.upload.addEventListener("progress", function (e) {
                 if (e.lengthComputable) {
@@ -68,12 +58,21 @@ $(function () {
 
             xhr.upload.addEventListener("load", function (e) {
                 self.refresh(100);
+                self.options.uploaded = true;
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200 || xhr.status === 204) {
+                        dfd.resolve();
+                    } else {
+                        dfd.failed();
+                    }
+                }
             }, false);
 
             xhr.open('PUT', this.options.url, true);
             xhr.setRequestHeader('Content-type', this.options.file.type);
             xhr.overrideMimeType(this.options.file.type);
             xhr.send(this.options.file);
+            return dfd.promise();
         },
 
         guid: function () {

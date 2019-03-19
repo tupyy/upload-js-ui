@@ -137,7 +137,9 @@ $(function () {
             });
             this.jqXHR.then(function () {
                 $.each(self.options.filesUI, (id, obj) => {
-                    obj.fileui('send');
+                    obj.fileui('send').then(function() {
+                        alert('done');
+                    })
                 });
             })
         },
