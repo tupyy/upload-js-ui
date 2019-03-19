@@ -128,15 +128,15 @@ $(function () {
             options.data = JSON.stringify(tempData)
         },
         _submit: function () {
-            let that = this,
+            let self = this,
                 o = this.options;
-            that._initDataforSigning(o);
+            self._initDataforSigning(o);
             this.jqXHR = $.ajax(o);
             this.jqXHR.done(function (result, textStatus, jqXHR) {
-                that._initDataForAws(result);
+                self._initDataForAws(result);
             });
             this.jqXHR.then(function () {
-                $.each(that.options.filesUI, (id, obj) => {
+                $.each(self.options.filesUI, (id, obj) => {
                     obj.fileui('send');
                 });
             })
@@ -147,8 +147,7 @@ $(function () {
             }
         },
         _initDataForAws: function (signed_urls) {
-            let that = this,
-                o = this.options;
+            let o = this.options;
             for (let key in signed_urls) {
                 if (key in o.filesUI) {
                     let item = o.filesUI[key];
