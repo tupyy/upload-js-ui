@@ -7,6 +7,7 @@ $(function () {
             id: undefined,
             progress: 0,
             uploaded: false,
+            xhr: undefined
         },
         _create: function () {
             this._super();
@@ -41,15 +42,16 @@ $(function () {
         },
 
         send: function () {
-            const xhr = new XMLHttpRequest();
-            dfd = $.Deferred();
+            this.options.xhr = new XMLHttpRequest();
+            let xhr = this.options.xhr;
+            let dfd = $.Deferred();
 
             if (this.options.uploaded) {
                 dfd.resolve();
             }
 
             const self = this;
-            xhr.upload.addEventListener("progress", function (e) {
+             xhr.upload.addEventListener("progress", function (e) {
                 if (e.lengthComputable) {
                     const progress = Math.round((e.loaded * 100) / e.total);
                     self.refresh(progress);
@@ -75,6 +77,13 @@ $(function () {
             return dfd.promise();
         },
 
+        abort: function() {
+          if (this.options.xhr) {
+              this.options.xhr.abort();
+              this.options.xhr = undefined;
+          }
+        },
+
         guid: function () {
             function _p8(s) {
                 var p = (Math.random().toString(16) + "000000000").substr(2, 8);
@@ -85,6 +94,7 @@ $(function () {
         }
         ,
         destroy: function () {
+            this.abort();
             this._off(this.element.find('.button'), 'click');
             this.element.remove();
         }
