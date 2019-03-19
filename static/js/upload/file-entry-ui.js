@@ -75,7 +75,10 @@ $(function () {
             xhr.setRequestHeader('Content-type', this.options.file.type);
             xhr.overrideMimeType(this.options.file.type);
             xhr.send(this.options.file);
-            return dfd.promise();
+
+            let promise = dfd.promise();
+            promise.abort = this.abort();
+            return promise;
         },
 
         abort: function () {
