@@ -51,24 +51,25 @@ $(function () {
             }
 
             const self = this;
-             xhr.upload.addEventListener("progress", function (e) {
+            xhr.upload.addEventListener("progress", function (e) {
                 if (e.lengthComputable) {
                     const progress = Math.round((e.loaded * 100) / e.total);
                     self.refresh(progress);
                 }
             }, false);
 
-            xhr.upload.addEventListener("load", function (e) {
-                self.refresh(100);
-                self.options.uploaded = true;
+            xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {
+                    self.refresh(100);
+                    self.options.uploaded = true;
+                    self.options.xhr = undefined;
                     if (xhr.status === 200 || xhr.status === 204) {
-                        dfd.resolve();
+                        dfd.resolve(self.options.id);
                     } else {
-                        dfd.failed();
+                        dfd.failed(self.options.id);
                     }
                 }
-            }, false);
+            };
 
             xhr.open('PUT', this.options.url, true);
             xhr.setRequestHeader('Content-type', this.options.file.type);
@@ -77,11 +78,15 @@ $(function () {
             return dfd.promise();
         },
 
-        abort: function() {
-          if (this.options.xhr) {
-              this.options.xhr.abort();
-              this.options.xhr = undefined;
-          }
+        abort: function () {
+            if (this.options.xhr) {
+                this.options.xhr.abort();
+                this.options.xhr = undefined;
+            }
+        },
+
+        isUploading: function () {
+            return this.options.xhr !== undefined;
         },
 
         guid: function () {
