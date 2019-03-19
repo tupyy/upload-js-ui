@@ -4,13 +4,22 @@ $(function () {
         _create: function () {
             this.element.addClass("upload-file");
             this.mainElement = $("<div></div>", {
-                "class": "file-ui row"
+                "class": "file-ui"
             }).appendTo(this.element);
 
             this.label = $("<span></span>", {
                 text: this.options.filename,
                 "class": "col-xs-2 file-label"
             }).appendTo(this.mainElement);
+
+            this.progressDiv = $("<div></div>", {
+                "class": "col progress"
+            }).appendTo(this.mainElement);
+
+            this.progressBar = $("<div></div>", {
+                "class": "progress-bar bg-success",
+                "style": "width: 0%"
+            }).appendTo(this.progressDiv);
 
             this.deleteButton = $("<button>", {
                 text: "Delete",
@@ -26,8 +35,8 @@ $(function () {
             });
         },
 
-        refresh: function () {
-            this.label.text(this.options.filename + " " + this.options.id);
+        refresh: function (progress) {
+            this.progressBar.attr('style','width: ' + progress + '%')
         },
     });
 });
